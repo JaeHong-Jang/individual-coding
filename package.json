@@ -1,0 +1,16 @@
+{
+  "name": "simple-board",
+  "version": "1.0.0",
+  "description": "공지사항과 일반 글을 작성할 수 있는 간단한 로컬 저장소 기반 게시판",
+  "private": true,
+  "scripts": {
+    "test": "echo \"No automated tests configured\""
+  },
+  "keywords": [
+    "board",
+    "notice",
+    "localstorage"
+  ],
+  "author": "",
+  "license": "MIT"
+}
