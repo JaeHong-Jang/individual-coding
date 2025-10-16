@@ -26,10 +26,80 @@ const NOTICE_EMPTY_SEARCH_TEXT = '검색 조건과 일치하는 공지사항이 
 const POST_EMPTY_TEXT = '아직 작성된 글이 없습니다.';
 const POST_EMPTY_SEARCH_TEXT = '검색 조건과 일치하는 게시글이 없습니다.';
 
+const TRUE_NOTICE_VALUES = new Set(['true', '1', 'notice', '공지', '공지사항', 'yes', 'y']);
+const FALSE_NOTICE_VALUES = new Set(['false', '0', '일반', 'normal', 'no', 'n']);
+
 let editingId = null;
 let searchTerm = '';
 let sortOrder = 'desc';
 let suppressResetMessage = false;
+
+function coerceNoticeFlag(value) {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (TRUE_NOTICE_VALUES.has(normalized)) return true;
+    if (FALSE_NOTICE_VALUES.has(normalized)) return false;
+    if (normalized === '') return false;
+  }
+  return Boolean(value);
+}
+
+function parseTimestamp(value, fallback = Date.now()) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed) {
+      const numeric = Number(trimmed);
+      if (Number.isFinite(numeric)) {
+        return numeric;
+      }
+
+      const parsed = Date.parse(trimmed);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+  }
+
+  return fallback;
+}
+
+function normalizePost(rawPost) {
+  if (!rawPost || typeof rawPost !== 'object') {
+    return null;
+  }
+
+  const id = typeof rawPost.id === 'string' && rawPost.id.trim() ? rawPost.id : createId();
+  const title = typeof rawPost.title === 'string' ? rawPost.title : '';
+  const content = typeof rawPost.content === 'string' ? rawPost.content : '';
+
+  let isNotice = false;
+  if ('isNotice' in rawPost) {
+    isNotice = coerceNoticeFlag(rawPost.isNotice);
+  } else if ('type' in rawPost) {
+    isNotice = coerceNoticeFlag(rawPost.type);
+  }
+
+  const createdSource =
+    rawPost.createdAt ?? rawPost.created ?? rawPost.date ?? rawPost.timestamp ?? Date.now();
+  const createdAt = parseTimestamp(createdSource);
+  const updatedAt =
+    rawPost.updatedAt == null ? null : parseTimestamp(rawPost.updatedAt, null);
+
+  return {
+    id,
+    title,
+    content,
+    isNotice,
+    createdAt,
+    updatedAt
+  };
+}
 
 function loadPosts() {
   try {
@@ -37,7 +107,15 @@ function loadPosts() {
     if (!saved) return [];
     const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed)) return [];
-    return parsed;
+
+    const normalizedPosts = parsed.map(normalizePost).filter(Boolean);
+    const normalizedJson = JSON.stringify(normalizedPosts);
+
+    if (saved !== normalizedJson) {
+      localStorage.setItem(STORAGE_KEY, normalizedJson);
+    }
+
+    return normalizedPosts;
   } catch (error) {
     console.error('게시글을 불러오는 중 오류가 발생했습니다.', error);
     return [];
@@ -169,6 +247,7 @@ function handleSubmit(event) {
   }
 
   const posts = loadPosts();
+
   if (editingId) {
     const exists = posts.some((post) => post.id === editingId);
     if (!exists) {
@@ -208,6 +287,7 @@ function handleSubmit(event) {
     showMessage('게시글이 등록되었습니다.', 'success');
     resetForm();
   }
+
   renderPosts();
 }
 
@@ -216,6 +296,7 @@ function handleDelete(id) {
   if (!confirmDelete) {
     return;
   }
+
   const posts = loadPosts();
   const nextPosts = posts.filter((post) => post.id !== id);
   savePosts(nextPosts);

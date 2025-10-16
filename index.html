@@ -37,15 +37,6 @@
       </form>
     </section>
 
-    <section class="panel" aria-labelledby="notice-heading">
-      <div class="panel-header">
-        <h2 id="notice-heading">공지사항</h2>
-        <span class="badge" id="notice-count">0</span>
-      </div>
-      <ul class="post-list" id="notice-list" aria-live="polite"></ul>
-      <p class="empty-message" id="notice-empty">등록된 공지사항이 없습니다.</p>
-    </section>
-
     <section class="panel panel--controls" aria-labelledby="board-controls">
       <h2 class="visually-hidden" id="board-controls">게시글 검색 및 정렬</h2>
       <div class="controls">
@@ -68,7 +59,16 @@
         </label>
       </div>
     </section>
-    
+
+    <section class="panel" aria-labelledby="notice-heading">
+      <div class="panel-header">
+        <h2 id="notice-heading">공지사항</h2>
+        <span class="badge" id="notice-count">0</span>
+      </div>
+      <ul class="post-list" id="notice-list" aria-live="polite"></ul>
+      <p class="empty-message" id="notice-empty">등록된 공지사항이 없습니다.</p>
+    </section>
+
     <section class="panel" aria-labelledby="post-heading">
       <div class="panel-header">
         <h2 id="post-heading">전체 글</h2>
@@ -104,4 +104,3 @@
   <script src="script.js" type="module"></script>
 </body>
 </html>
-
