@@ -29,7 +29,8 @@
           <label for="isNotice">공지사항으로 등록</label>
         </div>
         <div class="form-actions">
-          <button type="submit" class="button button--primary">등록</button>
+          <button type="submit" class="button button--primary" id="submit-button">등록</button>
+          <button type="button" class="button button--ghost" id="cancel-edit" hidden>수정 취소</button>
           <button type="reset" class="button button--secondary">초기화</button>
         </div>
         <p class="form-hint" role="alert" aria-live="polite" id="form-message" data-type="info"></p>
@@ -45,6 +46,29 @@
       <p class="empty-message" id="notice-empty">등록된 공지사항이 없습니다.</p>
     </section>
 
+    <section class="panel panel--controls" aria-labelledby="board-controls">
+      <h2 class="visually-hidden" id="board-controls">게시글 검색 및 정렬</h2>
+      <div class="controls">
+        <label class="controls__field" for="search">
+          <span class="controls__label">검색</span>
+          <input
+            type="search"
+            id="search"
+            name="search"
+            placeholder="제목이나 내용을 입력해 검색하세요"
+            autocomplete="off"
+          />
+        </label>
+        <label class="controls__field" for="sort-order">
+          <span class="controls__label">정렬</span>
+          <select id="sort-order" name="sort-order">
+            <option value="desc" selected>최신순</option>
+            <option value="asc">오래된순</option>
+          </select>
+        </label>
+      </div>
+    </section>
+    
     <section class="panel" aria-labelledby="post-heading">
       <div class="panel-header">
         <h2 id="post-heading">전체 글</h2>
@@ -64,8 +88,14 @@
         </header>
         <p class="post-content"></p>
         <footer class="post-footer">
-          <span class="post-type" aria-label="글 유형"></span>
-          <button type="button" class="button button--danger post-delete">삭제</button>
+          <div class="post-meta" aria-label="글 정보">
+            <span class="post-type" aria-label="글 유형"></span>
+            <span class="post-updated" aria-hidden="true"></span>
+          </div>
+          <div class="post-actions">
+            <button type="button" class="button button--ghost post-edit">수정</button>
+            <button type="button" class="button button--danger post-delete">삭제</button>
+          </div>
         </footer>
       </article>
     </li>
